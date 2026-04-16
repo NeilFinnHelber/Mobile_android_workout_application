@@ -21,6 +21,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".AddSessionActivity"
+            android:exported="false"
+            android:label="Add Session"
+            android:theme="@style/Theme.Productivity_application" />
+        <activity
+            android:name=".SessionDetailActivity"
+            android:exported="false"
+            android:label="Session Details"
+            android:theme="@style/Theme.Productivity_application" />
+        <activity
+            android:name=".AddExerciseActivity"
+            android:exported="false"
+            android:label="Add Exercise"
+            android:theme="@style/Theme.Productivity_application" />
     </application>
 
 </manifest>

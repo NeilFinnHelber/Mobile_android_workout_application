@@ -17,7 +17,7 @@ public class workout_session_log {
     public LocalDateTime performed_at;
 
     @ColumnInfo(defaultValue = "0")
-    public boolean completed;
+    public boolean isCompleted;
 
     @ColumnInfo(name = "session_id")
     public int session_id;
