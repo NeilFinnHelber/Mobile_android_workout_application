@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.room.*;
 import java.util.List;
 import com.example.productivity_application.db.entity.workout_session;
+import com.example.productivity_application.db.relation.SessionWithLogs;
 import com.example.productivity_application.db.relation.SessionWithOptions;
 
 @Dao
@@ -32,6 +33,10 @@ public interface workout_session_dao {
     LiveData<List<SessionWithOptions>> getAllSessionsWithOptions();
 
     @Transaction
+    @Query("SELECT * FROM workout_sessions")
+    LiveData<List<SessionWithLogs>> getAllSessionsWithLogs();
+
+    @Transaction
     @Query("SELECT * FROM workout_sessions WHERE routine_id = :routineId")
     LiveData<List<SessionWithOptions>> getSessionsWithOptions(int routineId);
 
@@ -42,5 +47,7 @@ public interface workout_session_dao {
     @Query("SELECT * FROM workout_sessions WHERE session_id = :sessionId")
     LiveData<SessionWithOptions> getSessionWithOptionsById(int sessionId);
 
-
+    @Transaction
+    @Query("SELECT * FROM workout_sessions WHERE session_id = :sessionId")
+    LiveData<SessionWithLogs> getSessionWithLogsById(int sessionId);
 }

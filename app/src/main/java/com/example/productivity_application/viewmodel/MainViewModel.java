@@ -14,6 +14,7 @@ import com.example.productivity_application.db.entity.workout_sports_routine;
 import com.example.productivity_application.db.relation.OptionsWithExercise;
 import com.example.productivity_application.db.relation.OptionsWithLogs;
 import com.example.productivity_application.db.relation.RoutineWithSessions;
+import com.example.productivity_application.db.relation.SessionWithLogs;
 import com.example.productivity_application.db.relation.SessionWithOptions;
 import com.example.productivity_application.repository.WorkoutRepository;
 
@@ -27,6 +28,7 @@ public class MainViewModel extends AndroidViewModel {
     public final LiveData<List<OptionsWithExercise>> allOptionsWithExercise;
     public final LiveData<List<OptionsWithLogs>> optionsWithLogs;
     public final LiveData<List<SessionWithOptions>> allSessionsWithOptions;
+    public final LiveData<List<SessionWithLogs>> allSessionsWithLogs;
     public final LiveData<List<workout_exercise>> allExercises;
     public final LiveData<List<workout_category>> allCategories;
 
@@ -38,6 +40,7 @@ public class MainViewModel extends AndroidViewModel {
         allOptionsWithExercise = repository.getAllOptionsWithExercise();
         optionsWithLogs = repository.getAllOptionsWithLogs();
         allSessionsWithOptions = repository.getAllSessionsWithOptions();
+        allSessionsWithLogs = repository.getAllSessionsWithLogs();
         allExercises = repository.getAllExercises();
         allCategories = repository.getAllCategories();
     }
@@ -77,6 +80,10 @@ public class MainViewModel extends AndroidViewModel {
 
     public LiveData<RoutineWithSessions> getRoutineWithSessions(int routineId) {
         return repository.getRoutineWithSessions(routineId);
+    }
+
+    public LiveData<SessionWithLogs> getSessionWithLogs(int sessionId) {
+        return repository.getSessionWithLogs(sessionId);
     }
 
 }

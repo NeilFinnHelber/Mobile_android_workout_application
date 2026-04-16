@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.gridlayout)
     annotationProcessor(libs.room.compiler)
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.livedata)
@@ -53,4 +54,5 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation("com.google.android.gms:play-services-wearable:19.0.0")
 }

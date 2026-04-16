@@ -20,6 +20,8 @@ public interface workout_session_log_dao {
     @Query("SELECT * FROM workout_session_logs WHERE session_id = :sessionId")
     LiveData<List<workout_session_log>> getLogsForSession(int sessionId);
 
-    @Query("UPDATE workout_session_logs SET completed = :completed WHERE session_log_id = :logId")
+    @Query("UPDATE workout_session_logs SET isCompleted = :completed WHERE session_log_id = :logId")
     void setCompleted(int logId, boolean completed);
+
+
 }

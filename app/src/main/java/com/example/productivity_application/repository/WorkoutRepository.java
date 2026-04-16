@@ -17,6 +17,7 @@ import com.example.productivity_application.db.relation.OptionsWithExercise;
 import com.example.productivity_application.db.relation.OptionsWithLogs;
 import com.example.productivity_application.db.relation.RoutineWithSessions;
 import com.example.productivity_application.db.dao.*;
+import com.example.productivity_application.db.relation.SessionWithLogs;
 import com.example.productivity_application.db.relation.SessionWithOptions;
 
 import java.util.List;
@@ -66,6 +67,12 @@ public class WorkoutRepository {
         return routineDao.getRoutineWithSessionsById(routineId);
     }
 
+    public LiveData<SessionWithLogs> getSessionWithLogs(int sessionId) {
+        return sessionDao.getSessionWithLogsById(sessionId);
+    }
+
+
+
 
     // ── ROUTINES ─────────────────────────────────────────────
 
@@ -81,6 +88,10 @@ public class WorkoutRepository {
 
     public LiveData<List<SessionWithOptions>> getAllSessionsWithOptions() {
         return sessionDao.getAllSessionsWithOptions();
+    }
+
+    public LiveData<List<SessionWithLogs>> getAllSessionsWithLogs() {
+        return sessionDao.getAllSessionsWithLogs();
     }
 
     public LiveData<List<SessionWithOptions>> getSessionsForRoutine(int routineId) {
