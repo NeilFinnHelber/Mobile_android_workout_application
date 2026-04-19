@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData;
 import com.example.productivity_application.db.entity.workout_category;
 import com.example.productivity_application.db.entity.workout_exercise;
 import com.example.productivity_application.db.entity.workout_option;
+import com.example.productivity_application.db.entity.workout_option_log;
 import com.example.productivity_application.db.entity.workout_session;
 import com.example.productivity_application.db.entity.workout_sports_routine;
 import com.example.productivity_application.db.relation.OptionsWithExercise;
@@ -63,6 +64,14 @@ public class MainViewModel extends AndroidViewModel {
         repository.insertExercise(exercise);
     }
 
+    public void insertCategory(workout_category category) {
+        repository.insertCategory(category);
+    }
+
+
+    public void updateOptionLog(workout_option_log log) {
+     repository.updateOptionLog(log);
+    }
 
 
     // gets

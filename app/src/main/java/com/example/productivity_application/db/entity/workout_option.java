@@ -41,4 +41,6 @@ public class workout_option {
 
     @ColumnInfo(defaultValue = "1")
     public boolean is_active;
+
+    public String imageUrl;
 }

@@ -11,6 +11,7 @@ import com.example.productivity_application.adapter.SessionDetailAdapter;
 import com.example.productivity_application.databinding.ActivitySessionDetailBinding;
 import com.example.productivity_application.db.entity.workout_category;
 import com.example.productivity_application.db.entity.workout_exercise;
+import com.example.productivity_application.db.entity.workout_option_log;
 import com.example.productivity_application.db.entity.workout_session;
 import com.example.productivity_application.db.relation.OptionsWithLogs;
 import com.example.productivity_application.viewmodel.MainViewModel;
@@ -18,7 +19,9 @@ import com.example.productivity_application.viewmodel.MainViewModel;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SessionDetailActivity extends AppCompatActivity {
+public class SessionDetailActivity extends AppCompatActivity implements SessionDetailAdapter.OnAddOptionClickListener {
+
+    public static final String EXTRA_EXERCISE_ID = "extra_exercise_id";
 
     private ActivitySessionDetailBinding binding;
     private MainViewModel viewModel;
@@ -57,13 +60,12 @@ public class SessionDetailActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        adapter = new SessionDetailAdapter();
+        adapter = new SessionDetailAdapter(this);
         binding.rvSessionDetail.setLayoutManager(new LinearLayoutManager(this));
         binding.rvSessionDetail.setAdapter(adapter);
     }
 
     private void observeData() {
-        // Observe current session to set the Title
         viewModel.getSessionWithLogs(sessionId).observe(this, data -> {
             if (data != null) {
                 this.currentSession = data.session;
@@ -92,7 +94,6 @@ public class SessionDetailActivity extends AppCompatActivity {
 
     private void updateAdapter() {
         if (exercises != null && currentSession != null && categories != null && optionsWithLogs != null) {
-            // Filter options to only those belonging to this session
             List<OptionsWithLogs> sessionOptions = optionsWithLogs.stream()
                     .filter(o -> o.option.session_id == sessionId)
                     .collect(Collectors.toList());
@@ -110,8 +111,26 @@ public class SessionDetailActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onAddOptionClick(workout_exercise exercise) {
+        Intent intent = new Intent(this, AddOptionActivity.class);
+        intent.putExtra(MainActivity.EXTRA_SESSION_ID, sessionId);
+        intent.putExtra(EXTRA_EXERCISE_ID, exercise.exercise_id);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onOptionDoneChanged(workout_option_log log, boolean isDone) {
+
+    }
+
+    @Override
     public boolean onSupportNavigateUp() {
         finish();
         return true;
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+        super.onPointerCaptureChanged(hasCapture);
     }
 }
