@@ -41,6 +41,11 @@
             android:exported="false"
             android:label="Add Option"
             android:theme="@style/Theme.Productivity_application" />
+        <activity
+            android:name=".OptionDetailActivity"
+            android:exported="false"
+            android:label="Exercise Details"
+            android:theme="@style/Theme.Productivity_application" />
     </application>
 
 </manifest>

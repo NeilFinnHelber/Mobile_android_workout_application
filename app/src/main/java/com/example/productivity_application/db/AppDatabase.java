@@ -12,6 +12,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import com.example.productivity_application.db.dao.*;
 import com.example.productivity_application.db.entity.*;
 
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -90,29 +91,52 @@ public abstract class AppDatabase extends RoomDatabase {
                         // ── Categories ─────────────────────
                         workout_category_dao categoryDao = database.workoutCategoryDao();
                         categoryDao.insert(new workout_category(){{
-                            name = "Chest";
+                            name = "Machine";
                         }});
                         categoryDao.insert(new workout_category(){{
-                            name = "Back";
-                        }});
-                        categoryDao.insert(new workout_category(){{
-                            name = "Legs";
+                            name = "Calisthenics";
                         }});
 
                         // ── Exercises ──────────────────────
                         workout_exercise_dao exerciseDao = database.workoutExerciseDao();
 
                         exerciseDao.insert(new workout_exercise(){{
-                            muscle_group = "Chest";
-                            description = "Bench Press";
+                            muscle_group = "chest";
+                            description = "Chest";
                             workout_option_to_complete_amount = 3;
                         }});
 
                         exerciseDao.insert(new workout_exercise(){{
-                            muscle_group = "Back";
-                            description = "Pull Ups";
+                            muscle_group = "back";
+                            description = "Back";
                             workout_option_to_complete_amount = 3;
                         }});
+
+                        // Options
+                        /*
+                        workout_option_dao optionDao = database.workoutOptionDao();
+
+                        optionDao.insert(new workout_option() {{
+                            name = "Bench Press";
+                            exercise_id = 1;
+                            category_id = 1;
+                            is_active = true;
+                        }});
+
+                        workout_option_log_dao optionLogDao = database.workoutOptionLogDao();
+
+                        optionLogDao.insert(new workout_option_log(){{
+                            option_id = 1;
+                            sets = new ArrayList<Boolean>(){{
+                                add(true);
+                                add(true);
+                                add(true);
+                            }};
+                            reps = 12;
+                            weight = 25;
+                        }});
+                        */
+
 
                         // ── Routine ────────────────────────
                         workout_sports_routine_dao routineDao = database.workoutSportsRoutineDao();

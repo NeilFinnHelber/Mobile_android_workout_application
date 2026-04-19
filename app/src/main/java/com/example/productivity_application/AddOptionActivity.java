@@ -1,10 +1,14 @@
 package com.example.productivity_application;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -25,6 +29,24 @@ public class AddOptionActivity extends AppCompatActivity {
     private int sessionId;
     private int exerciseId;
     private List<workout_category> categoriesList = new ArrayList<>();
+    private String selectedImageUri = "";
+
+    private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    Uri imageUri = result.getData().getData();
+                    if (imageUri != null) {
+                        // Persist permissions so we can access the image after app restart
+                        final int takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION;
+                        getContentResolver().takePersistableUriPermission(imageUri, takeFlags);
+                        
+                        selectedImageUri = imageUri.toString();
+                        binding.ivOptionPreview.setImageURI(imageUri);
+                    }
+                }
+            }
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +86,12 @@ public class AddOptionActivity extends AppCompatActivity {
     }
 
     private void setupButtons() {
+        binding.btnPickImage.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("image/*");
+            imagePickerLauncher.launch(intent);
+        });
         binding.saveOptionBtn.setOnClickListener(v -> saveOption());
         binding.cancelOptionButton.setOnClickListener(v -> finish());
     }
@@ -90,9 +118,9 @@ public class AddOptionActivity extends AppCompatActivity {
         int categoryId = categoriesList.get(categoryIndex).category_id;
 
         AppDatabase.dbWriteExecutor.execute(() -> {
-            // 1. Create the Option
             workout_option option = new workout_option();
             option.name = title;
+            option.imageUrl = selectedImageUri;
             option.exercise_id = exerciseId;
             option.session_id = sessionId;
             option.category_id = categoryId;
@@ -100,7 +128,6 @@ public class AddOptionActivity extends AppCompatActivity {
 
             long newOptionId = AppDatabase.getInstance(this).workoutOptionDao().insert(option);
 
-            // 2. Create the initial Log (Sets/Reps/Weight)
             workout_option_log log = new workout_option_log();
             log.option_id = (int) newOptionId;
             log.reps = repsStr.isEmpty() ? 0 : Integer.parseInt(repsStr);

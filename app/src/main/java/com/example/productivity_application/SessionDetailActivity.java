@@ -11,6 +11,7 @@ import com.example.productivity_application.adapter.SessionDetailAdapter;
 import com.example.productivity_application.databinding.ActivitySessionDetailBinding;
 import com.example.productivity_application.db.entity.workout_category;
 import com.example.productivity_application.db.entity.workout_exercise;
+import com.example.productivity_application.db.entity.workout_option_log;
 import com.example.productivity_application.db.entity.workout_session;
 import com.example.productivity_application.db.relation.OptionsWithLogs;
 import com.example.productivity_application.viewmodel.MainViewModel;
@@ -118,8 +119,18 @@ public class SessionDetailActivity extends AppCompatActivity implements SessionD
     }
 
     @Override
+    public void onOptionDoneChanged(workout_option_log log, boolean isDone) {
+
+    }
+
+    @Override
     public boolean onSupportNavigateUp() {
         finish();
         return true;
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+        super.onPointerCaptureChanged(hasCapture);
     }
 }

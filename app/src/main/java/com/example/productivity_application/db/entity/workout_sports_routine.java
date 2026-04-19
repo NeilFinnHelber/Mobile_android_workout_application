@@ -21,3 +21,5 @@ public class workout_sports_routine {
     public Time time_to_reset;
     public DayOfWeek day_of_reset;
 }
+
+/// to do: add this, edit and delete other things and allow for reset

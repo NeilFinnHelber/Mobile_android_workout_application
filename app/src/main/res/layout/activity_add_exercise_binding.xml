@@ -34,7 +34,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Exercise Title (e.g. Bench Press)"
+            android:hint="Muscle group (e.g. Trizeps)..."
             app:boxStrokeColor="@color/design_default_color_primary">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -43,19 +43,6 @@
                 android:layout_height="wrap_content"
                 android:inputType="textCapSentences" />
         </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Select Category:"
-            android:textColor="@color/black" />
-
-        <Spinner
-            android:id="@+id/category_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" />
 
         <Button
             android:id="@+id/save_exercise_btn"
