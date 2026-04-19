@@ -7,6 +7,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -28,10 +29,19 @@ import java.util.stream.Collectors;
 
 public class SessionDetailAdapter extends RecyclerView.Adapter<SessionDetailAdapter.DetailViewHolder> {
 
+    public interface OnAddOptionClickListener {
+        void onAddOptionClick(workout_exercise exercise);
+    }
+
     private List<workout_exercise> exercises = new ArrayList<>();
     private workout_session currentSession;
     private List<workout_category> categories = new ArrayList<>();
     private List<OptionsWithLogs> optionsWithLogs = new ArrayList<>();
+    private final OnAddOptionClickListener addOptionListener;
+
+    public SessionDetailAdapter(OnAddOptionClickListener addOptionListener) {
+        this.addOptionListener = addOptionListener;
+    }
 
     public void setData(List<workout_exercise> exercises, workout_session session, 
                         List<workout_category> categories, List<OptionsWithLogs> optionsWithLogs) {
@@ -46,7 +56,7 @@ public class SessionDetailAdapter extends RecyclerView.Adapter<SessionDetailAdap
     @Override
     public DetailViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_exercise_table, parent, false);
-        return new DetailViewHolder(v);
+        return new DetailViewHolder(v, addOptionListener);
     }
 
     @Override
@@ -63,16 +73,26 @@ public class SessionDetailAdapter extends RecyclerView.Adapter<SessionDetailAdap
     static class DetailViewHolder extends RecyclerView.ViewHolder {
         TextView tvExerciseName;
         TableLayout tableContent;
+        Button btnAddOption;
+        private final OnAddOptionClickListener listener;
 
-        DetailViewHolder(@NonNull View itemView) {
+        DetailViewHolder(@NonNull View itemView, OnAddOptionClickListener listener) {
             super(itemView);
+            this.listener = listener;
             tvExerciseName = itemView.findViewById(R.id.tv_exercise_name);
             tableContent = itemView.findViewById(R.id.table_content);
+            btnAddOption = itemView.findViewById(R.id.add_option_btn);
         }
 
         void bind(workout_exercise exercise, List<workout_category> allCategories, List<OptionsWithLogs> sessionOptions) {
             tvExerciseName.setText(exercise.description);
             tableContent.removeAllViews();
+            
+            btnAddOption.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onAddOptionClick(exercise);
+                }
+            });
 
             Context context = itemView.getContext();
             
@@ -85,16 +105,9 @@ public class SessionDetailAdapter extends RecyclerView.Adapter<SessionDetailAdap
                     .collect(Collectors.toList());
 
             if (exerciseOptions.isEmpty()) {
-                itemView.setVisibility(View.GONE);
-                ViewGroup.LayoutParams params = itemView.getLayoutParams();
-                params.height = 0;
-                itemView.setLayoutParams(params);
-                return;
-            } else {
-                itemView.setVisibility(View.VISIBLE);
-                ViewGroup.LayoutParams params = itemView.getLayoutParams();
-                params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                itemView.setLayoutParams(params);
+                // Keep it visible if you want users to be able to add the first option
+                // But if you prefer hidden:
+                // itemView.setVisibility(View.GONE); ...
             }
 
             for (OptionsWithLogs optWithLogs : exerciseOptions) {
@@ -105,7 +118,7 @@ public class SessionDetailAdapter extends RecyclerView.Adapter<SessionDetailAdap
                 String catName = categoryMap.getOrDefault(optWithLogs.option.category_id, "Unknown");
                 row.addView(createCell(context, catName, true));
 
-                // Column 2: Details (Name, Sets, Reps, Weight)
+                // Column 2: Details
                 StringBuilder details = new StringBuilder();
                 details.append(optWithLogs.option.name).append(":\n");
                 
@@ -126,7 +139,6 @@ public class SessionDetailAdapter extends RecyclerView.Adapter<SessionDetailAdap
 
                 tableContent.addView(row);
                 
-                // Add a small divider between rows
                 View divider = new View(context);
                 divider.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 2));
                 divider.setBackgroundColor(Color.parseColor("#444444"));
@@ -146,7 +158,6 @@ public class SessionDetailAdapter extends RecyclerView.Adapter<SessionDetailAdap
                 tv.setTypeface(null, Typeface.BOLD);
             }
             
-            // Add border/background to cell
             tv.setBackgroundResource(R.drawable.cell_border);
             
             TableRow.LayoutParams params = new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1f);

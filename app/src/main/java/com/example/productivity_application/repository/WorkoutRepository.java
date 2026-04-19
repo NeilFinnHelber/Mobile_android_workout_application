@@ -146,6 +146,10 @@ public class WorkoutRepository {
         return categoryDao.getAll();
     }
 
+    public void insertCategory(workout_category category) {
+        AppDatabase.dbWriteExecutor.execute(() -> categoryDao.insert(category));
+    }
+
     // ── SESSION LOGS (WEEKLY TRACKING) ────────────────────────
 
     public LiveData<List<workout_session_log>> getLogsForSession(int sessionId) {

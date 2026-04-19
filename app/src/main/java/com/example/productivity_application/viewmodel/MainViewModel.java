@@ -63,6 +63,9 @@ public class MainViewModel extends AndroidViewModel {
         repository.insertExercise(exercise);
     }
 
+    public void insertCategory(workout_category category) {
+        repository.insertCategory(category);
+    }
 
 
     // gets

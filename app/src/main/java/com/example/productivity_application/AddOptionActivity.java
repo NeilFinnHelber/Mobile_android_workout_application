@@ -8,43 +8,44 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.productivity_application.databinding.ActivityAddExerciseBindingBinding;
+import com.example.productivity_application.databinding.ActivityAddOptionOfExerciseBindingBinding;
 import com.example.productivity_application.db.AppDatabase;
 import com.example.productivity_application.db.entity.workout_category;
-import com.example.productivity_application.db.entity.workout_exercise;
 import com.example.productivity_application.db.entity.workout_option;
+import com.example.productivity_application.db.entity.workout_option_log;
 import com.example.productivity_application.viewmodel.MainViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddExerciseActivity extends AppCompatActivity {
+public class AddOptionActivity extends AppCompatActivity {
 
-    private ActivityAddExerciseBindingBinding binding;
+    private ActivityAddOptionOfExerciseBindingBinding binding;
     private MainViewModel viewModel;
     private int sessionId;
+    private int exerciseId;
     private List<workout_category> categoriesList = new ArrayList<>();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityAddExerciseBindingBinding.inflate(getLayoutInflater());
+
+        binding = ActivityAddOptionOfExerciseBindingBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         sessionId = getIntent().getIntExtra(MainActivity.EXTRA_SESSION_ID, -1);
+        exerciseId = getIntent().getIntExtra(SessionDetailActivity.EXTRA_EXERCISE_ID, -1);
 
         setSupportActionBar(binding.toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Add Exercise to Session");
+            getSupportActionBar().setTitle("Add Option to Exercise");
         }
 
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         setupCategorySpinner();
-        setupSaveButton();
-        setupAddCategoryButton();
+        setupButtons();
     }
 
     private void setupCategorySpinner() {
@@ -62,22 +63,26 @@ public class AddExerciseActivity extends AppCompatActivity {
         });
     }
 
-    private void setupSaveButton() {
-        binding.saveExerciseBtn.setOnClickListener(v -> saveExercise());
+    private void setupButtons() {
+        binding.saveOptionBtn.setOnClickListener(v -> saveOption());
+        binding.cancelOptionButton.setOnClickListener(v -> finish());
     }
 
-    private void saveExercise() {
-        if (binding.exerciseTitle.getText() == null) return;
+    private void saveOption() {
+        if (binding.optionTitle.getText() == null) return;
 
-        String title = binding.exerciseTitle.getText().toString().trim();
+        String title = binding.optionTitle.getText().toString().trim();
+        String setsStr = binding.setAmount.getText().toString().trim();
+        String repsStr = binding.repsPerSet.getText().toString().trim();
+        String kgStr = binding.kgPerRep.getText().toString().trim();
 
         if (title.isEmpty()) {
-            binding.exerciseTitleBox.setError("Title is required");
+            binding.optionTitleBox.setError("Title is required");
             return;
         }
-        
+
         if (categoriesList.isEmpty()) {
-            Toast.makeText(this, "Please wait for categories to load", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Categories loading...", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -85,52 +90,34 @@ public class AddExerciseActivity extends AppCompatActivity {
         int categoryId = categoriesList.get(categoryIndex).category_id;
 
         AppDatabase.dbWriteExecutor.execute(() -> {
-            // 1. Create Exercise
-            workout_exercise exercise = new workout_exercise();
-            exercise.description = title;
-            exercise.muscle_group = categoriesList.get(categoryIndex).name;
-            
-            // Note: Since insert returns long (the new row ID), we use it for the option
-            long exerciseId = AppDatabase.getInstance(this).workoutExerciseDao().insert(exercise);
-
-            // 2. Create Option (The Link)
+            // 1. Create the Option
             workout_option option = new workout_option();
             option.name = title;
-            option.exercise_id = (int) exerciseId;
+            option.exercise_id = exerciseId;
             option.session_id = sessionId;
             option.category_id = categoryId;
             option.is_active = true;
 
-            viewModel.insertOption(option);
+            long newOptionId = AppDatabase.getInstance(this).workoutOptionDao().insert(option);
+
+            // 2. Create the initial Log (Sets/Reps/Weight)
+            workout_option_log log = new workout_option_log();
+            log.option_id = (int) newOptionId;
+            log.reps = repsStr.isEmpty() ? 0 : Integer.parseInt(repsStr);
+            log.weight = kgStr.isEmpty() ? 0 : Integer.parseInt(kgStr);
+            
+            int setsCount = setsStr.isEmpty() ? 0 : Integer.parseInt(setsStr);
+            ArrayList<Boolean> setsList = new ArrayList<>();
+            for(int i=0; i<setsCount; i++) setsList.add(false);
+            log.sets = setsList;
+
+            AppDatabase.getInstance(this).workoutOptionLogDao().insert(log);
 
             runOnUiThread(() -> {
-                Toast.makeText(this, "Exercise added to session", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Option saved", Toast.LENGTH_SHORT).show();
                 finish();
             });
         });
-    }
-    
-    private void setupAddCategoryButton() {
-        binding.saveCategoryBtn.setOnClickListener(v -> addCategory());
-    }
-    
-    private void addCategory() {
-        if (binding.categoryTitle.getText() == null) return;
-        String title = binding.categoryTitle.getText().toString().trim();
-
-        if (title.isEmpty()) {
-            binding.categoryTitleBox.setError("Category name is required");
-            return;
-        }
-
-        workout_category category = new workout_category();
-        category.name = title;
-
-        viewModel.insertCategory(category);
-        
-        binding.categoryTitle.setText("");
-        binding.categoryTitleBox.setError(null);
-        Toast.makeText(this, "Category '" + title + "' created", Toast.LENGTH_SHORT).show();
     }
 
     @Override
