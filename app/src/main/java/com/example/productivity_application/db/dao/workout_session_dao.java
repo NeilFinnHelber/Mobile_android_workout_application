@@ -40,6 +40,10 @@ public interface workout_session_dao {
     @Query("SELECT * FROM workout_sessions WHERE routine_id = :routineId")
     LiveData<List<SessionWithOptions>> getSessionsWithOptions(int routineId);
 
+    @Transaction
+    @Query("SELECT * FROM workout_sessions WHERE routine_id = :routineId")
+    LiveData<List<SessionWithLogs>> getSessionsWithLogsByRoutine(int routineId);
+
     @Query("UPDATE workout_sessions SET is_active = :active WHERE session_id = :sessionId")
     void setActive(int sessionId, boolean active);
 

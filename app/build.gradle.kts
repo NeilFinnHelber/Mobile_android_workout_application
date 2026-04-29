@@ -54,5 +54,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation("com.daimajia.swipelayout:library:1.2.0@aar")
     implementation("com.google.android.gms:play-services-wearable:19.0.0")
 }

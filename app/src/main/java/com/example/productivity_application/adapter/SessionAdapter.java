@@ -9,32 +9,32 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.productivity_application.R;
 import com.example.productivity_application.db.entity.workout_session;
 import com.example.productivity_application.db.entity.workout_session_log;
+import com.example.productivity_application.db.entity.workout_sports_routine;
 import com.example.productivity_application.db.relation.SessionWithLogs;
-import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
+public class SessionAdapter extends RecyclerView.Adapter<SessionAdapter.TaskViewHolder> {
 
     public interface OnTaskClickListener {
         void onTaskClick(workout_session item);
 
         void onTaskChecked(workout_session item, boolean isChecked);
+
+        void onRoutineClicked(workout_sports_routine item);
     }
 
 
     private List<SessionWithLogs> sessions = new ArrayList<>();
     private final OnTaskClickListener listener;
 
-    public TaskAdapter(OnTaskClickListener listener) {
+    public SessionAdapter(OnTaskClickListener listener) {
         this.listener = listener;
     }
 

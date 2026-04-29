@@ -1,13 +1,17 @@
 package com.example.productivity_application;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.productivity_application.adapter.ExercisePickerAdapter;
 import com.example.productivity_application.databinding.ActivityAddExerciseBindingBinding;
+import com.example.productivity_application.db.AppDatabase;
 import com.example.productivity_application.db.entity.workout_category;
 import com.example.productivity_application.db.entity.workout_exercise;
 import com.example.productivity_application.viewmodel.MainViewModel;
@@ -16,6 +20,8 @@ public class AddExerciseActivity extends AppCompatActivity {
 
     private ActivityAddExerciseBindingBinding binding;
     private MainViewModel viewModel;
+    private int sessionId;
+    private ExercisePickerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,15 +29,31 @@ public class AddExerciseActivity extends AppCompatActivity {
         binding = ActivityAddExerciseBindingBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        sessionId = getIntent().getIntExtra(MainActivity.EXTRA_SESSION_ID, -1);
+
         setSupportActionBar(binding.toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Create New Exercise");
+            getSupportActionBar().setTitle("Add Exercise to Session");
         }
 
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
+        setupRecyclerView();
         setupButtons();
+    }
+
+    private void setupRecyclerView() {
+        adapter = new ExercisePickerAdapter(exercise -> {
+            // Pick existing exercise and go to Add Option
+            goToAddOption(exercise.exercise_id);
+        });
+        binding.rvExistingExercises.setLayoutManager(new LinearLayoutManager(this));
+        binding.rvExistingExercises.setAdapter(adapter);
+
+        viewModel.allExercises.observe(this, exercises -> {
+            adapter.setExercises(exercises);
+        });
     }
 
     private void setupButtons() {
@@ -54,10 +76,21 @@ public class AddExerciseActivity extends AppCompatActivity {
         exercise.muscle_group = ""; 
         exercise.completed = false;
 
-        viewModel.insertExercise(exercise);
+        AppDatabase.dbWriteExecutor.execute(() -> {
+            long exerciseId = AppDatabase.getInstance(this).workoutExerciseDao().insert(exercise);
+            runOnUiThread(() -> {
+                Toast.makeText(this, "Exercise Created", Toast.LENGTH_SHORT).show();
+                goToAddOption((int) exerciseId);
+            });
+        });
+    }
 
-        Toast.makeText(this, "Exercise Created", Toast.LENGTH_SHORT).show();
-        finish(); // Close activity after saving
+    private void goToAddOption(int exerciseId) {
+        Intent intent = new Intent(this, AddOptionActivity.class);
+        intent.putExtra(MainActivity.EXTRA_SESSION_ID, sessionId);
+        intent.putExtra(SessionDetailActivity.EXTRA_EXERCISE_ID, exerciseId);
+        startActivity(intent);
+        finish();
     }
     
     private void saveCategory() {
@@ -75,7 +108,8 @@ public class AddExerciseActivity extends AppCompatActivity {
         viewModel.insertCategory(category);
         
         Toast.makeText(this, "Category Created", Toast.LENGTH_SHORT).show();
-        finish(); // Close activity after saving
+        binding.categoryTitle.setText("");
+        binding.categoryTitleBox.setError(null);
     }
 
     @Override
