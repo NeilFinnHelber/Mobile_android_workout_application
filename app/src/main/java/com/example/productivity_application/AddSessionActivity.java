@@ -18,15 +18,16 @@ public class AddSessionActivity extends AppCompatActivity {
 
     private ActivityAddSessionBindingBinding binding;
     private MainViewModel viewModel;
-
-    private List<Integer> selectedTagIds = new ArrayList<>();
-
+    private int routineId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityAddSessionBindingBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // Get the routine ID from intent extras
+        routineId = getIntent().getIntExtra(MainActivity.EXTRA_ROUTINE_ID, -1);
 
         setSupportActionBar(binding.toolbar);
         if (getSupportActionBar() != null) {
@@ -59,8 +60,8 @@ public class AddSessionActivity extends AppCompatActivity {
         session.name = title;
         session.is_active = true;
         
-        // Use default routine ID 1 (created in seedCallback)
-        session.routine_id = 1; 
+        // Use the passed routine ID, or fall back to default ID 1 if none was selected
+        session.routine_id = (routineId != -1) ? routineId : 1; 
 
         viewModel.insertSession(session);
         
@@ -75,6 +76,5 @@ public class AddSessionActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-
     }
 }

@@ -17,6 +17,7 @@ import com.example.productivity_application.db.relation.OptionsWithLogs;
 import com.example.productivity_application.viewmodel.MainViewModel;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SessionDetailActivity extends AppCompatActivity implements SessionDetailAdapter.OnAddOptionClickListener {
@@ -98,12 +99,22 @@ public class SessionDetailActivity extends AppCompatActivity implements SessionD
                     .filter(o -> o.option.session_id == sessionId)
                     .collect(Collectors.toList());
             
-            adapter.setData(exercises, currentSession, categories, sessionOptions);
+            // Filter exercises to only those that have options in this session
+            Set<Integer> exerciseIdsInSession = sessionOptions.stream()
+                    .map(o -> o.option.exercise_id)
+                    .collect(Collectors.toSet());
+
+            List<workout_exercise> filteredExercises = exercises.stream()
+                    .filter(e -> exerciseIdsInSession.contains(e.exercise_id))
+                    .collect(Collectors.toList());
+            
+            adapter.setData(filteredExercises, currentSession, categories, sessionOptions);
         }
     }
 
     private void setupFab() {
         binding.fabAddExercise.setOnClickListener(v -> {
+            // TODO: This should ideally open a picker for existing exercises OR allow creating a new one
             Intent intent = new Intent(this, AddExerciseActivity.class);
             intent.putExtra(MainActivity.EXTRA_SESSION_ID, sessionId);
             startActivity(intent);
@@ -120,7 +131,8 @@ public class SessionDetailActivity extends AppCompatActivity implements SessionD
 
     @Override
     public void onOptionDoneChanged(workout_option_log log, boolean isDone) {
-
+        log.completed = isDone;
+        viewModel.updateOptionLog(log);
     }
 
     @Override
